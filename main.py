@@ -1,4 +1,5 @@
 # is this how you installed lightgbm?
+# i think you installed something permanent installed
 # https://www.geeksforgeeks.org/how-to-install-xgboost-and-lightgbm-on-macos/
 
 
