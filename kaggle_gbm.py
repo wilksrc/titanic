@@ -1,4 +1,5 @@
 # https://www.kaggle.com/code/shep312/applying-lightgbm-to-titanic-dataset
+# https://neptune.ai/blog/lightgbm-parameters-guide
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -80,19 +81,46 @@ clf = lgbm.train(train_set=train_data,
                 )
 optimum_boost_rounds = clf.best_iteration
 
+
+# todo work in progress
+# trying to do the regular gradient boosted algo.
+lgbm_params2 = {
+    'boosting': 'gbdt',          # dart (drop out trees) often performs better
+    'application': 'binary',     # Binary classification
+    'learning_rate': 0.05,       # Learning rate, controls size of a gradient descent step
+    'min_data_in_leaf': 20,      # Data set is quite small so reduce this a bit
+    'feature_fraction': 0.7,     # Proportion of features in each boost, controls overfitting
+    'num_leaves': 41,            # Controls size of tree since LGBM uses leaf wise splits
+    'metric': 'binary_logloss',  # Area under ROC curve as the evaulation metric
+    'drop_rate': 0.15
+              }
+
+evaluation_results2 = {}
+clf2 = lgbm.train(train_set=train_data,
+                 params=lgbm_params2,
+                 valid_sets=[train_data, test_data],
+                 valid_names=['Train', 'Test'],
+                 evals_result=evaluation_results2,
+                 num_boost_round=500,
+                 early_stopping_rounds=100
+                )
+
+
+
 fig, axs = plt.subplots(1, 2, figsize=[15, 4])
 
 # Plot the log loss during training
 axs[0].plot(evaluation_results['Train']['binary_logloss'], label='Train')
 axs[0].plot(evaluation_results['Test']['binary_logloss'], label='Test')
+axs[0].plot(evaluation_results2['Train']['binary_logloss'], label='Train2')  # new
+axs[0].plot(evaluation_results2['Test']['binary_logloss'], label='Test2')  # new
 axs[0].set_ylabel('Log loss')
 axs[0].set_xlabel('Boosting round')
 axs[0].set_title('Training performance')
 axs[0].legend()
 
 # Plot feature importance
-importances = pd.DataFrame({'features': clf.feature_name(),
-                            'importance': clf.feature_importance()}).sort_values('importance', ascending=False)
+importances = pd.DataFrame({'features': clf.feature_name(), 'importance': clf.feature_importance()}).sort_values('importance', ascending=False)
 axs[1].bar(x=np.arange(len(importances)), height=importances['importance'])
 axs[1].set_xticks(np.arange(len(importances)))
 axs[1].set_xticklabels(importances['features'])

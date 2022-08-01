@@ -5,7 +5,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 
-def onewaysummary(df_input, xvars, target, exposure, boo_stack=False):
+def onewaysummary(df_input, xvars, target, exposure, boo_stack=True):
     """
     returns a dictionary of univariate summary dataframes or a stacked single dataframe (based on boo_stack)
     inputs:
@@ -33,7 +33,7 @@ def onewaysummary(df_input, xvars, target, exposure, boo_stack=False):
         return dict_summary
 
 
-def onewayplot(df_input, barvar, linevar):
+def onewayplot(df_input, barvar='rec', linevar='freq'):
     """
     plots a stacked dataframe of univariate summaries
     inputs:
@@ -47,7 +47,7 @@ def onewayplot(df_input, barvar, linevar):
 
     # initialize figure.
     ncols = 5
-    nrows = max(math.ceil((len(ls_variables) / ncols)), 2)
+    nrows = max(math.ceil((len(ls_variables) / ncols)), 2)  # need at least 2 x 2 figure in order for plot object references to exist.
     fig, axs = plt.subplots(nrows=nrows, ncols=ncols)
 
     i = 0
@@ -77,17 +77,10 @@ def onewayplot(df_input, barvar, linevar):
                 ax2.set_ylabel('freq', fontsize=myfontsize)
                 ax2.yaxis.set_tick_params(labelsize=myfontsize)
 
-                # show it.
-                plt.show()
-
                 # increment variable index.
                 i += 1
-
-
-
-
-
-
-
-
-
+            else:
+                # delete the subplot.
+                axs[currrow, currcol].remove()
+    # display the plots.
+    plt.show()
